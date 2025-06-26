@@ -5,14 +5,12 @@
 #include "wifi_config.h"
 #endif
 
-#include "pins_config.h"
-
 #define STEPPER_0_9 0 // 0.9 degree stepper motor
 #define STEPPER_1_8 1 // 1.8 degree stepper motor
 
 #define TRACKING_RATE_BOARD_V2 1
-
-#define MOTOR_TRACKING_RATE TRACKING_RATE_BOARD_V2
+#define TRACKING_RATE_D1_R32 2
+#define TRACKING_RATE_NATGEO 3
 
 /*To build in Arduino IDE, install esp32 boards V3.0x and the Arduinojson library by Benoit
  * Blanchon*/
@@ -38,6 +36,7 @@
 #ifndef STEPPER_TYPE
 #define STEPPER_TYPE STEPPER_0_9 // 0.9 degree stepper motor
 #endif
+
 // Configure the wifi settings if you are not using platformio
 #ifndef WIFI_SSID
 #define WIFI_SSID "OG Star Tracker" // change to your SSID
@@ -69,37 +68,33 @@
 
 /**********************/
 
-#define USE_MSx_PINS_MICROSTEPPING 1
-#define USE_TMC_DRIVER_MICROSTEPPING 2
-
-#define MICROSTEPPING_MOTOR_DRIVER USE_MSx_PINS_MICROSTEPPING
-
 /*****DO NOT MODIFY BELOW*****/
-// Set the resolution per step for the stepper motor
+
 #if STEPPER_TYPE == STEPPER_0_9
 #define ARCSEC_PER_STEP 2.0
 #else
 #define ARCSEC_PER_STEP 4.0
 #endif
 
-// LEDs for intervalometer status and general purpose status led
-#define INTERV_PIN 25
-#define STATUS_LED 26 // (Red)
-#define LANG_EEPROM_ADDR 0
-#define PRESETS_EEPROM_START_LOCATION 1
+#define USE_MSx_PINS_MICROSTEPPING 1
+#define USE_TMC_DRIVER_MICROSTEPPING 2
 
-// Stepper driver pins -- intended for TMC2209 for now
-// AXIS 1 - RA
-#define AXIS1_STEP 5
-#define AXIS1_DIR 15
-#define SPREAD_1 4
-// AXIS 2 - DEC
-#define AXIS2_STEP 19
-#define AXIS2_DIR 18
-#define SPREAD_2 21
-// common pins
-#define RA_MS1 23
-#define RA_MS2 22
-#define EN12_n 17
+#if defined(BOARD_BOARD_V2)
+#include "config/board_v2.h"
+#elif defined(BOARD_WEMOS_D1_R32)
+#include "config/wemos_d1_r32.h"
+#elif defined(BOARD_ARDUINO_NANO_ESP32)
+#include "config/arduino_nano_esp32.h"
+#else
+#error Unknown board
+#endif
+
+#ifndef MICROSTEPPING_MOTOR_DRIVER
+#define MICROSTEPPING_MOTOR_DRIVER USE_MSx_PINS_MICROSTEPPING
+#endif
+
+#ifndef MOTOR_TRACKING_RATE
+#define MOTOR_TRACKING_RATE TRACKING_RATE_BOARD_V2
+#endif
 
 #endif

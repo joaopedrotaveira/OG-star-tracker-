@@ -2,7 +2,12 @@
 
 TmcMotorDriver::TmcMotorDriver(HardwareSerial* serialPort, uint8_t addr, float rSense,
                                uint8_t rxPin, uint8_t txPin)
-    : serialPort(serialPort), addr(addr), tmc_driver(serialPort, rSense, addr)
+    : serialPort(serialPort), addr(addr),
+#if TMC_DRIVER_MODEL == 2208
+      tmc_driver(serialPort, rSense)
+#else
+      tmc_driver(serialPort, rSense, addr)
+#endif
 {
     if (serialPort != nullptr)
     {

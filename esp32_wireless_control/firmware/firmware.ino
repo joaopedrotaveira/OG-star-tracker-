@@ -493,7 +493,6 @@ void setup()
     // Start the debug serial connection
     setup_uart(&Serial, 115200);
 
-    // start UART task before any usage of print_out
     if (xTaskCreate(uartTask, "uart", 4096, NULL, 1, NULL))
     {
         print_out_tbl(TSK_CLEAR_SCREEN);
