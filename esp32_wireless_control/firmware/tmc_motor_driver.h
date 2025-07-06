@@ -6,15 +6,16 @@
 #include <Arduino.h>
 #include <TMCStepper.h>
 
-class TmcMotorDriver: public MotorDriver
+class TmcMotorDriver : public MotorDriver
 {
-public:
-    TmcMotorDriver(HardwareSerial *serialPort, uint8_t addr, float rSense , uint8_t rxPin, uint8_t txPin);
+  public:
+    TmcMotorDriver(HardwareSerial* serialPort, uint8_t addr, float rSense, uint8_t rxPin,
+                   uint8_t txPin);
     ~TmcMotorDriver(){};
     void setMicrosteps(uint16_t microsteps);
 
-private:
-    HardwareSerial *serialPort;
+  private:
+    HardwareSerial* serialPort;
     uint8_t addr;
 #if TMC_DRIVER_MODEL == 2208
     TMC2208Stepper tmc_driver;

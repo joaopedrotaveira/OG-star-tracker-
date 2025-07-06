@@ -48,9 +48,10 @@ void Intervalometer::startCapture()
     currentState = PRE_DELAY;
     intervalometerActive = true;
     startCaptureTickCount = xTaskGetTickCount();
-    captureDurationTickCount = pdMS_TO_TICKS((currentSettings.preDelay +
-        currentSettings.exposures * currentSettings.exposureTime +
-        (currentSettings.exposures - 1) * currentSettings.delayTime)*1000);
+    captureDurationTickCount = pdMS_TO_TICKS(
+        (currentSettings.preDelay + currentSettings.exposures * currentSettings.exposureTime +
+         (currentSettings.exposures - 1) * currentSettings.delayTime) *
+        1000);
 }
 
 /* MODES:
@@ -86,7 +87,6 @@ void Intervalometer::run()
 
             if (!timerStarted)
             {
-
                 print_out("Intervalometer: PREDELAY_START");
                 if ((currentSettings.mode == DAY_TIME_LAPSE ||
                      currentSettings.mode == DAY_TIME_LAPSE_PAN) &&

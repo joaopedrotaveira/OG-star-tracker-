@@ -31,7 +31,7 @@ class Axis
     int64_t getAxisCount();
 
     void startTracking(uint64_t rate, bool directionArg);
-//    void startTracking(trackingRateS rate, bool directionArg);
+    //    void startTracking(trackingRateS rate, bool directionArg);
     void stopTracking();
     void startSlew(uint64_t rate, bool directionArg);
     void stopSlew();
@@ -49,16 +49,29 @@ class Axis
     volatile bool counterActive;
 
     uint64_t trackingRate;
-//    trackingRateS trackingRate;
+    //    trackingRateS trackingRate;
 
-    uint16_t getMicrostep() { return microStep; }
+    uint16_t getMicrostep()
+    {
+        return microStep;
+    }
 
     volatile int64_t position;
-    void resetPosition() { setPosition(0); }
-    void setPosition(int64_t pos) { position = pos; }
-    int64_t getPosition() { return position; }
+    void resetPosition()
+    {
+        setPosition(0);
+    }
+    void setPosition(int64_t pos)
+    {
+        position = pos;
+    }
+    int64_t getPosition()
+    {
+        return position;
+    }
 
     HardwareTimer stepTimer;
+
   private:
     void setDirection(bool directionArg);
     void setMicrostep(uint16_t microstep);

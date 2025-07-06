@@ -8,9 +8,9 @@
 #define STEPPER_0_9 0 // 0.9 degree stepper motor
 #define STEPPER_1_8 1 // 1.8 degree stepper motor
 
-#define TRACKING_RATE_BOARD_V2	1
-#define TRACKING_RATE_D1_R32	2
-#define TRACKING_RATE_NATGEO	3
+#define TRACKING_RATE_BOARD_V2 1
+#define TRACKING_RATE_D1_R32 2
+#define TRACKING_RATE_NATGEO 3
 
 //#define MOTOR_TRACKING_RATE	TRACKING_RATE_BOARD_V2
 //#define MOTOR_TRACKING_RATE	TRACKING_RATE_D1_R32
@@ -26,7 +26,7 @@
 #define DEC_INVERT_DIR_PIN 0         // if need to invert direction pin set to 1
 #define DEFAULT_ENABLE_TRACKING 1    // set to 1 to enable tracking at startup
 #define DITHER_DISTANCE_X10_PIXELS 5 // set max distance to dither in multiple of 10 pixels
-#define MAX_CUSTOM_SLEW_RATE 1500     // Set max custom slew rate to X tracking rate
+#define MAX_CUSTOM_SLEW_RATE 1500    // Set max custom slew rate to X tracking rate
 #define MIN_CUSTOM_SLEW_RATE 2       // Set min custom slew rate to X tracking rate
 
 #ifndef TRACKING_RATE
@@ -85,13 +85,13 @@
 #define USE_TMC_DRIVER_MICROSTEPPING 2
 
 #if defined(BOARD_BOARD_V2)
-#	include "config/board_v2.h"
+#include "config/board_v2.h"
 #elif defined(BOARD_WEMOS_D1_R32)
-#	include "config/wemos_d1_r32.h"
+#include "config/wemos_d1_r32.h"
 #elif defined(BOARD_ARDUINO_NANO_ESP32)
-#	include "config/arduino_nano_esp32.h"
+#include "config/arduino_nano_esp32.h"
 #else
-#	error Unknown board
+#error Unknown board
 #endif
 
 #ifndef MICROSTEPPING_MOTOR_DRIVER
@@ -101,6 +101,5 @@
 #ifndef MOTOR_TRACKING_RATE
 #define MOTOR_TRACKING_RATE TRACKING_RATE_BOARD_V2
 #endif
-
 
 #endif

@@ -25,8 +25,8 @@
 #include "display.h"
 #endif
 
-#include "bsc5/bsc5ra.h"
 #include "bsc5/bsc5_notes.h"
+#include "bsc5/bsc5ra.h"
 
 SerialTerminal term(CLI_NEWLINE_CHAR, CLI_DELIMITER_CHAR);
 WebServer server(WEBSERVER_PORT);
@@ -36,38 +36,37 @@ Languages language = EN;
 
 class MyFadinglight : public BaseFader
 {
-public:
-	MyFadinglight(int pin, bool logarithmic = true, int fade_speed = 30, bool invert = false)
+  public:
+    MyFadinglight(int pin, bool logarithmic = true, int fade_speed = 30, bool invert = false)
         : BaseFader(logarithmic, fade_speed), pin_(pin), _invert(invert)
     {
     }
 
     void write(int state) override
     {
-        if(!_invert)
+        if (!_invert)
             analogWrite(pin_, state);
         else
-            analogWrite(pin_, 255-state);
+            analogWrite(pin_, 255 - state);
     }
 
-private:
+  private:
     int pin_;
     bool _invert;
-
 };
 
 MyFadinglight led_red(STATUS_LED, true, 20, STATUS_LED_INVERTED);
 
 #if HAVE_ENCODER
 #include <RotaryEncoder.h>
-RotaryEncoder *encoder1 = nullptr;
+RotaryEncoder* encoder1 = nullptr;
 
 #ifdef ESP32
 IRAM_ATTR
 #endif
 void checkPosition()
 {
-	encoder1->tick(); // just call tick() to check the state.
+    encoder1->tick(); // just call tick() to check the state.
 }
 
 void encoderTask(void* pvParameters);
@@ -83,15 +82,15 @@ void consoleTask(void* pvParameters);
 void webserverTask(void* pvParameters);
 void intervalometerTask(void* pvParameters);
 
-
 extern const uint8_t interface_index_html_start[] asm("_binary_interface_index_html_start");
 extern const uint8_t interface_index_html_end[] asm("_binary_interface_index_html_end");
 
 // Handle requests to the root URL ("/")
 void handleRoot()
 {
-//    String htmlString = html_content;
-    String htmlString = String(interface_index_html_start, interface_index_html_end-interface_index_html_start);
+    //    String htmlString = html_content;
+    String htmlString =
+        String(interface_index_html_start, interface_index_html_end - interface_index_html_start);
     for (int placeholder = 0; placeholder < numberOfHTMLStrings; placeholder++)
     {
         htmlString.replace(HTMLplaceHolders[placeholder],
@@ -480,21 +479,22 @@ void handleSearch()
     JsonDocument results;
 
     std::list<Note> notes = bsc5_notes.search(query);
-    for(auto note : notes) {
-//    	print_out_nonl("note: %d %s\n", note.id, note.description.c_str());
-//    	results.add(note.toJson(results));
+    for (auto note : notes)
+    {
+        //    	print_out_nonl("note: %d %s\n", note.id, note.description.c_str());
+        //    	results.add(note.toJson(results));
 
-    	std::optional<Entry> entry = bsc5.findByXno(note.id);
-    	if(entry.has_value())
-    	{
-    		print_out_nonl("Description: %s\n", note.description.c_str());
-    		entry.value().print();
-    	}
-    	note.toJson(results);
+        std::optional<Entry> entry = bsc5.findByXno(note.id);
+        if (entry.has_value())
+        {
+            print_out_nonl("Description: %s\n", note.description.c_str());
+            entry.value().print();
+        }
+        note.toJson(results);
 
-//    	JsonObject jsonNote = results.add<JsonObject>();
-//    	jsonNote["id"] = note.id;
-//    	jsonNote["description"] = note.description;
+        //    	JsonObject jsonNote = results.add<JsonObject>();
+        //    	jsonNote["id"] = note.id;
+        //    	jsonNote["description"] = note.description;
     }
     serializeJson(results, json);
     // print_out(json);
@@ -564,9 +564,9 @@ void setupWireless()
     print_out("Starting mDNS responder");
     if (!MDNS.begin(MDNS_NAME))
     {
-		print_out("Error starting mDNS responder");
-		return;
-	}
+        print_out("Error starting mDNS responder");
+        return;
+    }
     print_out("mDNS responder started");
 
     MDNS.addService("http", "tcp", WEBSERVER_PORT);
@@ -575,7 +575,6 @@ void setupWireless()
 
     MDNS.addService("ogtracker", "tcp", WEBSERVER_PORT);
     MDNS.addServiceTxt("ogtracker", "tcp", "version", BUILD_VERSION);
-
 }
 
 void setup()
@@ -636,41 +635,42 @@ void setup()
         print_out_tbl(TSK_START_WEBSERVER);
 
 #if HAVE_ENCODER
-	if (xTaskCreate(encoderTask, "encoder", 4096, NULL, 1, NULL))
-		print_out("Encoder task");
+    if (xTaskCreate(encoderTask, "encoder", 4096, NULL, 1, NULL))
+        print_out("Encoder task");
 #endif
 
 #if HAVE_BUTTON
-	if (xTaskCreate(buttonTask, "button", 4096, NULL, 1, NULL))
-		print_out("Button task");
+    if (xTaskCreate(buttonTask, "button", 4096, NULL, 1, NULL))
+        print_out("Button task");
 #endif
 
-//    bsc5.printHeader();
-//    bsc5.printStar(0);
-//    std::list<Note> notes = bsc5_notes.search("polaris");
-//    for(auto note : notes) {
-//    	print_out_nonl("note: %d %s\n", note.id, note.description.c_str());
-//    }
+    //    bsc5.printHeader();
+    //    bsc5.printStar(0);
+    //    std::list<Note> notes = bsc5_notes.search("polaris");
+    //    for(auto note : notes) {
+    //    	print_out_nonl("note: %d %s\n", note.id, note.description.c_str());
+    //    }
 }
 
 void loop()
 {
-    for (;;) {
-		if (ra_axis.slewActive)
-		{
-			// Blink status LED if mount is in slew mode
-			led_red.blink();
-		}
-		else if (ra_axis.trackingActive)
-		{
-			// Turn on status LED if sidereal tracking is ON
-			led_red.on();
-		}
-		else
-		{
-			led_red.off();
-		}
-		vTaskDelay(1);
+    for (;;)
+    {
+        if (ra_axis.slewActive)
+        {
+            // Blink status LED if mount is in slew mode
+            led_red.blink();
+        }
+        else if (ra_axis.trackingActive)
+        {
+            // Turn on status LED if sidereal tracking is ON
+            led_red.on();
+        }
+        else
+        {
+            led_red.off();
+        }
+        vTaskDelay(1);
     }
 }
 
@@ -716,66 +716,71 @@ void consoleTask(void* pvParameters)
 #if HAVE_ENCODER
 void encoderTask(void* pvParameters)
 {
-	encoder1 = new RotaryEncoder(ENCODER_A_PIN, ENCODER_B_PIN, RotaryEncoder::LatchMode::FOUR3);
-	attachInterrupt(digitalPinToInterrupt(ENCODER_A_PIN), checkPosition, CHANGE);
-	attachInterrupt(digitalPinToInterrupt(ENCODER_B_PIN), checkPosition, CHANGE);
-	long int encoder = encoder1->getPosition();
+    encoder1 = new RotaryEncoder(ENCODER_A_PIN, ENCODER_B_PIN, RotaryEncoder::LatchMode::FOUR3);
+    attachInterrupt(digitalPinToInterrupt(ENCODER_A_PIN), checkPosition, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(ENCODER_B_PIN), checkPosition, CHANGE);
+    long int encoder = encoder1->getPosition();
 
-	long int encoder_tmp;
-	for (;;)
-	{
-		encoder_tmp = encoder1->getPosition();
-		if (encoder != encoder_tmp)
-		{
-			encoder = encoder_tmp;
-//			print_out_nonl("encoder: %ld\n", encoder_tmp);
-//			uint64_t current_tracking_rate = TRACKING_SIDEREAL;
-			uint64_t new_tracking_rate = TRACKING_SIDEREAL + encoder;
-			if(ra_axis.trackingActive)
-			{
-				ra_axis.startTracking(new_tracking_rate, ra_axis.axisAbsoluteDirection);
-			}
-		}
-		vTaskDelay(1);
-	}
+    long int encoder_tmp;
+    for (;;)
+    {
+        encoder_tmp = encoder1->getPosition();
+        if (encoder != encoder_tmp)
+        {
+            encoder = encoder_tmp;
+            //			print_out_nonl("encoder: %ld\n", encoder_tmp);
+            //			uint64_t current_tracking_rate = TRACKING_SIDEREAL;
+            uint64_t new_tracking_rate = TRACKING_SIDEREAL + encoder;
+            if (ra_axis.trackingActive)
+            {
+                ra_axis.startTracking(new_tracking_rate, ra_axis.axisAbsoluteDirection);
+            }
+        }
+        vTaskDelay(1);
+    }
 }
 #endif
 
 #if HAVE_BUTTON
-void onEb1Clicked(EventButton& eb) {
-	print_out_nonl("eb1 clicked. Click count: %d\n", eb.clickCount());
+void onEb1Clicked(EventButton& eb)
+{
+    print_out_nonl("eb1 clicked. Click count: %d\n", eb.clickCount());
 }
-void onEb1Pressed(EventButton& eb) {
-	print_out_nonl("eb1 Pressed. Click count: %d\n", eb.clickCount());
+void onEb1Pressed(EventButton& eb)
+{
+    print_out_nonl("eb1 Pressed. Click count: %d\n", eb.clickCount());
 }
-void onEb1Released(EventButton& eb) {
-	print_out_nonl("eb1 Released. Click count: %d\n", eb.clickCount());
+void onEb1Released(EventButton& eb)
+{
+    print_out_nonl("eb1 Released. Click count: %d\n", eb.clickCount());
 }
-void onEb1DoubleClicked(EventButton& eb) {
-	print_out_nonl("eb1 double clicked. Click count: %d\n", eb.clickCount());
+void onEb1DoubleClicked(EventButton& eb)
+{
+    print_out_nonl("eb1 double clicked. Click count: %d\n", eb.clickCount());
 }
-void onEb1TripleClicked(EventButton& eb) {
-	print_out_nonl("eb1 triple clicked. Click count: %d\n", eb.clickCount());
+void onEb1TripleClicked(EventButton& eb)
+{
+    print_out_nonl("eb1 triple clicked. Click count: %d\n", eb.clickCount());
 }
-void onEb1LongClicked(EventButton& eb) {
-	print_out_nonl("eb1 long clicked. Click count: %d\n", eb.clickCount());
-	encoder1->setPosition(0);
+void onEb1LongClicked(EventButton& eb)
+{
+    print_out_nonl("eb1 long clicked. Click count: %d\n", eb.clickCount());
+    encoder1->setPosition(0);
 }
 
 void buttonTask(void* pvParameters)
 {
-	eb1.setClickHandler(onEb1Clicked);
-	eb1.setPressedHandler(onEb1Pressed);
-	eb1.setReleasedHandler(onEb1Released);
-	eb1.setDoubleClickHandler(onEb1DoubleClicked);
-	eb1.setTripleClickHandler(onEb1TripleClicked);
-	eb1.setLongClickHandler(onEb1LongClicked);
+    eb1.setClickHandler(onEb1Clicked);
+    eb1.setPressedHandler(onEb1Pressed);
+    eb1.setReleasedHandler(onEb1Released);
+    eb1.setDoubleClickHandler(onEb1DoubleClicked);
+    eb1.setTripleClickHandler(onEb1TripleClicked);
+    eb1.setLongClickHandler(onEb1LongClicked);
 
-	for (;;)
-	{
-		eb1.update();
-		vTaskDelay(1);
-	}
+    for (;;)
+    {
+        eb1.update();
+        vTaskDelay(1);
+    }
 }
 #endif
-

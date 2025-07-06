@@ -71,10 +71,22 @@ class Intervalometer
     Settings currentSettings;
     Settings presets[10];
     ErrorMessage currentErrorMessage;
-    uint16_t getCurrentExposure() { return current_exposure; }
-    uint16_t getExposuresTaken() { return exposures_taken; }
-    TickType_t getStartCaptureTickCount() { return startCaptureTickCount; }
-    TickType_t getCaptureDurationTickCount() { return captureDurationTickCount; }
+    uint16_t getCurrentExposure()
+    {
+        return current_exposure;
+    }
+    uint16_t getExposuresTaken()
+    {
+        return exposures_taken;
+    }
+    TickType_t getStartCaptureTickCount()
+    {
+        return startCaptureTickCount;
+    }
+    TickType_t getCaptureDurationTickCount()
+    {
+        return captureDurationTickCount;
+    }
     void readPresetsFromEEPROM();
     void abortCapture();
     void startCapture();

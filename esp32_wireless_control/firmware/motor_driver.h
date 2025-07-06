@@ -6,7 +6,7 @@
 class MotorDriver
 {
   public:
-    MotorDriver() {};
+    MotorDriver(){};
     virtual void setMicrosteps(uint16_t microsteps) = 0;
 };
 
