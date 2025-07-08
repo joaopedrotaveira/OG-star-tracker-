@@ -17,6 +17,10 @@
 #include "web_languages.h"
 #include "website_strings.h"
 
+#if HAVE_DISPLAY
+#include "display.h"
+#endif
+
 SerialTerminal term(CLI_NEWLINE_CHAR, CLI_DELIMITER_CHAR);
 WebServer server(WEBSERVER_PORT);
 Languages language = EN;
@@ -492,6 +496,10 @@ void setup()
 {
     // Start the debug serial connection
     setup_uart(&Serial, 115200);
+
+#if HAVE_DISPLAY
+    display.begin();
+#endif
 
     if (xTaskCreate(uartTask, "uart", 4096, NULL, 1, NULL))
     {
