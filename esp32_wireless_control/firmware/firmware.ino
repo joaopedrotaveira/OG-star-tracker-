@@ -25,6 +25,31 @@ SerialTerminal term(CLI_NEWLINE_CHAR, CLI_DELIMITER_CHAR);
 WebServer server(WEBSERVER_PORT);
 Languages language = EN;
 
+#include <Fadinglight.h>
+
+class MyFadinglight : public BaseFader
+{
+  public:
+    MyFadinglight(int pin, bool logarithmic = true, int fade_speed = 30, bool invert = false)
+        : BaseFader(logarithmic, fade_speed), pin_(pin), _invert(invert)
+    {
+    }
+
+    void write(int state) override
+    {
+        if (!_invert)
+            analogWrite(pin_, state);
+        else
+            analogWrite(pin_, 255 - state);
+    }
+
+  private:
+    int pin_;
+    bool _invert;
+};
+
+MyFadinglight led_red(STATUS_LED, true, 20, STATUS_LED_INVERTED);
+
 void uartTask(void* pvParameters);
 void consoleTask(void* pvParameters);
 void webserverTask(void* pvParameters);
@@ -549,8 +574,6 @@ void setup()
 
 void loop()
 {
-    int delay_ticks = 0;
-
     if (DEFAULT_ENABLE_TRACKING == 1)
     {
         ra_axis.startTracking(ra_axis.rate.tracking, ra_axis.direction.tracking);
@@ -561,16 +584,18 @@ void loop()
         if (ra_axis.slewActive)
         {
             // Blink status LED if mount is in slew mode
-            digitalWrite(STATUS_LED, !digitalRead(STATUS_LED));
-            delay_ticks = 150; // Delay for 150 ms
+            led_red.blink();
+        }
+        else if (ra_axis.trackingActive)
+        {
+            // Turn on status LED if sidereal tracking is ON
+            led_red.on();
         }
         else
         {
-            // Turn on status LED if sidereal tracking is ON
-            digitalWrite(STATUS_LED, ra_axis.trackingActive ? HIGH : LOW);
-            delay_ticks = 1000; // Delay for 1 second
+            led_red.off();
         }
-        vTaskDelay(delay_ticks);
+        vTaskDelay(1);
     }
 }
 
