@@ -32,11 +32,11 @@
 
 #define HAVE_DISPLAY 1
 // LCD Display settings
-#define LCD_COLUMNS 16
-#define LCD_ROWS	2
-//#define LCD_COLUMNS 20
-//#define LCD_ROWS	4
-#define SDA_PIN		32
-#define SCL_PIN		33
+//#define LCD_COLUMNS 16
+//#define LCD_ROWS	2
+#define LCD_COLUMNS 20
+#define LCD_ROWS 4
+#define SDA_PIN 32
+#define SCL_PIN 33
 
 #endif /* _WEMOS_D1_R32_H_ */

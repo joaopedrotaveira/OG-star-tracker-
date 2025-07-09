@@ -3,6 +3,13 @@
 
 #include "pins_config.h"
 
+#define HAVE_ENCODER 1
+#define ENCODER_A_PIN Coolant
+#define ENCODER_B_PIN Resume
+
+#define HAVE_BUTTON 1
+#define BUTTON_PIN Hold
+
 /*****DO NOT MODIFY BELOW*****/
 
 #define MOTOR_TRACKING_RATE TRACKING_RATE_D1_R32
@@ -36,9 +43,9 @@
 //#define LCD_COLUMNS 16
 //#define LCD_ROWS	2
 #define LCD_COLUMNS 20
-#define LCD_ROWS	4
+#define LCD_ROWS 4
 
-#define SDA_PIN		SDA
-#define SCL_PIN		SCL
+#define SDA_PIN SDA
+#define SCL_PIN SCL
 
 #endif /* _ARDUINO_NANO_ESP32_H_ */
