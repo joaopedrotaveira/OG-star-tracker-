@@ -1,8 +1,12 @@
 #include <ArduinoJson.h>
+#include <ESP32Time.h>
 #include <ESPmDNS.h>
 #include <ErriezSerialTerminal.h>
+#include <EventButton.h>
 #include <WebServer.h>
 #include <WiFi.h>
+#include <esp_netif_sntp.h>
+#include <esp_sntp.h>
 #include <esp_wifi.h>
 #include <freertos/FreeRTOS.h>
 #include <string.h>
@@ -16,8 +20,6 @@
 #include "uart.h"
 #include "web_languages.h"
 #include "website_strings.h"
-
-#include <EventButton.h>
 
 #if HAVE_DISPLAY
 #include "display.h"
@@ -499,6 +501,17 @@ void setupWireless()
         print_out(".");
     }
 #endif
+
+    esp_sntp_config_t config = ESP_NETIF_SNTP_DEFAULT_CONFIG("pool.ntp.org");
+    esp_netif_sntp_init(&config);
+
+    if (esp_netif_sntp_sync_wait(pdMS_TO_TICKS(10000)) != ESP_OK)
+    {
+        print_out("Failed to update system time within 10s timeout");
+    }
+
+    ESP32Time time;
+    print_out_nonl("%s\n", time.getTime("%Y-%m-%dT%H:%M:%S").c_str());
 
     server.on("/", HTTP_GET, handleRoot);
     server.on("/on", HTTP_GET, handleOn);
