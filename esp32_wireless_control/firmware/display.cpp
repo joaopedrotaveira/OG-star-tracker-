@@ -136,8 +136,10 @@ void Display::updateDisplay()
 
     lcd.setCursor(0, 3);
     snprintf(line, LCD_COLUMNS + 1, "%s",
-             toHoursMinutesSeconds(universal_time(time.getHour(true), time.getMinute(),
-                                                  time.getSecond() + time.getMillis() / 1000.0))
+             Hours(universal_time(time.getHour(true), time.getMinute(),
+                                  time.getSecond() + time.getMillis() / 1000.0))
+                 .toHourMinuteSecond()
+                 .toString()
                  .c_str());
     lcd.print(line);
 
@@ -149,7 +151,7 @@ void Display::updateDisplay()
     double ha = position2 / (60.0 * 60.0 * STEPS_PER_SECOND_256MICROSTEP);
     double ra = haToRa(ha, lmst);
     print_out_nonl("ut: %f jd: %f lmst: %f ha: %f ra: %f %s\n", ut, jd, lmst, ha, ra,
-                   toHoursMinutesSeconds(ra).c_str());
+                   Hours(ra).toHourMinuteSecond().toString().c_str());
 
 #endif
 }
