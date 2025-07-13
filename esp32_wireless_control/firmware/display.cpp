@@ -1,13 +1,15 @@
 #include "config.h"
 
 #if HAVE_DISPLAY
+#include <ESP32Time.h>
+#include <inttypes.h>
 
 #include "axis.h"
 #include "display.h"
 #include "intervalometer.h"
 #include "uart.h"
+#include "utils/sideral_functions.h"
 #include "web_languages.h"
-#include <inttypes.h>
 
 extern Languages language;
 
@@ -51,6 +53,8 @@ void Display::begin()
 
 void Display::updateDisplay()
 {
+    ESP32Time time;
+
     lcd.setCursor(0, 0);
     for (int i = 0; i < LCD_COLUMNS; i++)
     {
@@ -77,30 +81,34 @@ void Display::updateDisplay()
     int hour = seconds / 3600;
     //	snprintf(line, LCD_COLUMNS+1, "RA:%s%02d %02d' %02d.%03d\"", seconds < 0 ? "-":" " ,
     // abs(hour), abs(min), abs(sec), abs(milisec));
-    snprintf(line, LCD_COLUMNS + 1, "%s%02d %02d' %02d.%03d\"", seconds < 0 ? "-" : " ", abs(hour),
-             abs(min), abs(sec), abs(milisec));
+    snprintf(line, LCD_COLUMNS + 1, "%02d %02d' %02d.%03d\"", abs(hour), abs(min), abs(sec),
+             abs(milisec));
     lcd.print(line);
 
 #if LCD_ROWS > 2
-    static bool line2Cleared = false;
-    if (intervalometer.intervalometerActive)
-    {
-        lcd.setCursor(0, 2);
-        uint16_t exposures = intervalometer.currentSettings.exposures;
-        uint16_t currentExposure = intervalometer.getCurrentExposure();
-        uint16_t exposuresTaken = intervalometer.getExposuresTaken();
-        snprintf(line, LCD_COLUMNS + 1, "Exposures: %" PRIu16 "/%" PRIu16 "/%" PRIu16,
-                 exposuresTaken, currentExposure, exposures);
-        lcd.print(line);
+    //    static bool line2Cleared = false;
+    //    if (intervalometer.intervalometerActive)
+    //    {
+    //        lcd.setCursor(0, 2);
+    //        uint16_t exposures = intervalometer.currentSettings.exposures;
+    //        uint16_t currentExposure = intervalometer.getCurrentExposure();
+    //        uint16_t exposuresTaken = intervalometer.getExposuresTaken();
+    //        snprintf(line, LCD_COLUMNS + 1, "Exposures: %" PRIu16 "/%" PRIu16 "/%" PRIu16,
+    //                 exposuresTaken, currentExposure, exposures);
+    //        lcd.print(line);
+    //
+    //        line2Cleared = false;
+    //    }
+    //    else if (!line2Cleared)
+    //    {
+    //        lcd.setCursor(0, 2);
+    //        lcd.print("                    ");
+    //        line2Cleared = true;
+    //    }
+    lcd.setCursor(0, 2);
+    snprintf(line, LCD_COLUMNS + 1, "%s", time.getTime("%Y-%m-%dT%H:%M:%S").c_str());
+    lcd.print(line);
 
-        line2Cleared = false;
-    }
-    else if (!line2Cleared)
-    {
-        lcd.setCursor(0, 2);
-        lcd.print("                    ");
-        line2Cleared = true;
-    }
 #endif
 #if LCD_ROWS > 3
     //	static bool line3Cleared = false;
@@ -122,9 +130,26 @@ void Display::updateDisplay()
     //		lcd.print("                    ");
     //		line3Cleared = true;
     //	}
+    //    lcd.setCursor(0, 3);
+    //    snprintf(line, LCD_COLUMNS + 1, "%10lld", ra_axis.rate.tracking);
+    //    lcd.print(line);
+
     lcd.setCursor(0, 3);
-    snprintf(line, LCD_COLUMNS + 1, "%10lld", ra_axis.rate.tracking);
+    snprintf(line, LCD_COLUMNS + 1, "%s",
+             toHoursMinutesSeconds(universal_time(time.getHour(true), time.getMinute(),
+                                                  time.getSecond() + time.getMillis() / 1000.0))
+                 .c_str());
     lcd.print(line);
+
+    double ut = universal_time(time.getHour(true), time.getMinute(),
+                               time.getSecond() + time.getMicros() / 1000000.0);
+    double jd = julian_day(time.getYear(), time.getMonth(), time.getDay(), time.getHour(true),
+                           time.getMinute(), time.getSecond() + time.getMicros() / 1000000.0);
+    double lmst = local_mean_sidereal_time(jd, -9.07564194);
+    double ha = position2 / (60.0 * 60.0 * STEPS_PER_SECOND_256MICROSTEP);
+    double ra = haToRa(ha, lmst);
+    print_out_nonl("ut: %f jd: %f lmst: %f ha: %f ra: %f %s\n", ut, jd, lmst, ha, ra,
+                   toHoursMinutesSeconds(ra).c_str());
 
 #endif
 }
