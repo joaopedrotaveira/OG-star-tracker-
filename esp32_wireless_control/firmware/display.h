@@ -6,19 +6,20 @@
 class Display
 {
   public:
-    Display(uint8_t sda_pin, uint8_t scl_pin);
+    Display();
+
+    virtual void init() = 0;
 
     void begin();
 
-    void updateDisplay();
+    virtual void updateDisplay() = 0;
+
     const char* getCurrentStatusMessage();
 
   private:
     static void displayTask(void* pvParameters);
-    uint8_t _sda_pin;
-    uint8_t _scl_pin;
 };
 
-extern Display display;
+extern Display* display;
 
 #endif /* _DISPLAY_H_ */

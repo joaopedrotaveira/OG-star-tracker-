@@ -557,10 +557,10 @@ void setup()
     // Start the debug serial connection
     setup_uart(&Serial, 115200);
 
-#if HAVE_DISPLAY
-    display.begin();
-#endif
-
+    //#if HAVE_DISPLAY
+    //    display.begin();
+    //#endif
+    //
     if (xTaskCreate(uartTask, "uart", 4096, NULL, 1, NULL))
     {
         print_out_tbl(TSK_CLEAR_SCREEN);
@@ -592,6 +592,10 @@ void setup()
 
     // Initialize Wifi and web server
     setupWireless();
+
+#if HAVE_DISPLAY
+    display->begin();
+#endif
 
     // Initialize the console serial
     setup_terminal(&term);
