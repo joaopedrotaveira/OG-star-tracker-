@@ -27,7 +27,8 @@ double local_mean_sidereal_time(double jd, double longitude)
     tmp = (tmp > 0) ? tmp : tmp + 24;
 
     double lmst = 24.0 * fmod(tmp / 24.0, 1);
-    return lmst;
+
+    return lmst > 0 ? lmst : lmst + 24.0;
 }
 
 double greenwich_mean_sidereal_time(double jd)

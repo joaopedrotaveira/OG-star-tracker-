@@ -5,6 +5,34 @@
 #include <math.h>
 #include <stdio.h>
 
+template <typename T, typename Total, size_t N> class Moving_Average
+{
+  public:
+    Moving_Average& operator()(T sample)
+    {
+        total_ += sample;
+        if (num_samples_ < N)
+            samples_[num_samples_++] = sample;
+        else
+        {
+            T& oldest = samples_[num_samples_++ % N];
+            total_ -= oldest;
+            oldest = sample;
+        }
+        return *this;
+    }
+
+    operator double() const
+    {
+        return total_ / std::min(num_samples_, N);
+    }
+
+  private:
+    T samples_[N];
+    size_t num_samples_{0};
+    Total total_{0};
+};
+
 class Hours
 {
   public:
@@ -23,8 +51,8 @@ class Hours
         {
             char buffer[21] = {0};
             double millis = fmod(_seconds, 1);
-            snprintf(buffer, 20, "%02d %02d' %02.0f.%03.0f\"", _hours, _minutes, _seconds,
-                     millis * 1000);
+            snprintf(buffer, 20, "%02d %02d' %02.0f.%03.0f\"", _hours, abs(_minutes), abs(_seconds),
+                     abs(floor(millis * 1000)));
             return String(buffer);
         }
 

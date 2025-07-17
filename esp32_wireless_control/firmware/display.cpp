@@ -53,7 +53,12 @@ void Display::begin()
 
 void Display::updateDisplay()
 {
-    ESP32Time time;
+    ESP32Time esp32_time;
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    tm time = esp32_time.getTimeStruct();
+
+    static Moving_Average<double, double, 5> ma;
 
     lcd.setCursor(0, 0);
     for (int i = 0; i < LCD_COLUMNS; i++)
@@ -73,16 +78,33 @@ void Display::updateDisplay()
     position2 =
         (position2 > 0) ? position2 : position2 + (24 * 60 * 60 * STEPS_PER_SECOND_256MICROSTEP);
 
-    int seconds = position2 / STEPS_PER_SECOND_256MICROSTEP;
-    int milisec = (1000 / STEPS_PER_SECOND_256MICROSTEP) *
-                  (position2 - STEPS_PER_SECOND_256MICROSTEP * seconds);
-    int sec = seconds % 60;
-    int min = (seconds / 60) % 60;
-    int hour = seconds / 3600;
-    //	snprintf(line, LCD_COLUMNS+1, "RA:%s%02d %02d' %02d.%03d\"", seconds < 0 ? "-":" " ,
-    // abs(hour), abs(min), abs(sec), abs(milisec));
-    snprintf(line, LCD_COLUMNS + 1, "%02d %02d' %02d.%03d\"", abs(hour), abs(min), abs(sec),
-             abs(milisec));
+    //    int seconds = position2 / STEPS_PER_SECOND_256MICROSTEP;
+    //    int milisec = (1000 / STEPS_PER_SECOND_256MICROSTEP) *
+    //                  (position2 - STEPS_PER_SECOND_256MICROSTEP * seconds);
+    //    int sec = seconds % 60;
+    //    int min = (seconds / 60) % 60;
+    //    int hour = seconds / 3600;
+    //    //	snprintf(line, LCD_COLUMNS+1, "RA:%s%02d %02d' %02d.%03d\"", seconds < 0 ? "-":" " ,
+    //    // abs(hour), abs(min), abs(sec), abs(milisec));
+    //    snprintf(line, LCD_COLUMNS + 1, "%02d %02d' %02d.%03d\"", abs(hour), abs(min), abs(sec),
+    //             abs(milisec));
+    //    lcd.print(line);
+
+    position = ra_axis.getPosition();
+    position2 = position % ((int64_t) (24 * 60 * 60 * STEPS_PER_SECOND_256MICROSTEP));
+    position2 =
+        (position2 > 0) ? position2 : position2 + (24 * 60 * 60 * STEPS_PER_SECOND_256MICROSTEP);
+
+    double ut = universal_time(time.tm_hour, time.tm_min, time.tm_sec + tv.tv_usec / 1000000.0);
+    double jd = julian_day(time.tm_year + 1900, time.tm_mon, time.tm_mday, time.tm_hour,
+                           time.tm_min, time.tm_sec + tv.tv_usec / 1000000.0);
+    double lmst = local_mean_sidereal_time(jd, -9.07564194);
+    double ha = position2 / (60.0 * 60.0 * STEPS_PER_SECOND_256MICROSTEP);
+    double ra = haToRa(ha, lmst);
+
+    double ma_ra = ma(ra);
+
+    snprintf(line, LCD_COLUMNS + 1, "RA: %s", Hours(ma_ra).toHourMinuteSecond().toString().c_str());
     lcd.print(line);
 
 #if LCD_ROWS > 2
@@ -106,7 +128,9 @@ void Display::updateDisplay()
     //        line2Cleared = true;
     //    }
     lcd.setCursor(0, 2);
-    snprintf(line, LCD_COLUMNS + 1, "%s", time.getTime("%Y-%m-%dT%H:%M:%S").c_str());
+    //    snprintf(line, LCD_COLUMNS + 1, "%s", time.getTime("%Y-%m-%dT%H:%M:%S").c_str());
+    //    lcd.print(line);
+    snprintf(line, LCD_COLUMNS + 1, "HA: %s", Hours(ha).toHourMinuteSecond().toString().c_str());
     lcd.print(line);
 
 #endif
@@ -135,23 +159,16 @@ void Display::updateDisplay()
     //    lcd.print(line);
 
     lcd.setCursor(0, 3);
-    snprintf(line, LCD_COLUMNS + 1, "%s",
-             Hours(universal_time(time.getHour(true), time.getMinute(),
-                                  time.getSecond() + time.getMillis() / 1000.0))
+    snprintf(line, LCD_COLUMNS + 1, "UT: %s",
+             Hours(universal_time(time.tm_hour, time.tm_min, time.tm_sec + tv.tv_usec / 1000000.0))
                  .toHourMinuteSecond()
                  .toString()
                  .c_str());
     lcd.print(line);
 
-    double ut = universal_time(time.getHour(true), time.getMinute(),
-                               time.getSecond() + time.getMicros() / 1000000.0);
-    double jd = julian_day(time.getYear(), time.getMonth(), time.getDay(), time.getHour(true),
-                           time.getMinute(), time.getSecond() + time.getMicros() / 1000000.0);
-    double lmst = local_mean_sidereal_time(jd, -9.07564194);
-    double ha = position2 / (60.0 * 60.0 * STEPS_PER_SECOND_256MICROSTEP);
-    double ra = haToRa(ha, lmst);
-    print_out_nonl("ut: %f jd: %f lmst: %f ha: %f ra: %f %s\n", ut, jd, lmst, ha, ra,
-                   Hours(ra).toHourMinuteSecond().toString().c_str());
+    print_out_nonl("ut: %f jd: %f lmst: %f ha: %f ra: %f %s ma_ra: %f %s\n", ut, jd, lmst, ha, ra,
+                   Hours(ra).toHourMinuteSecond().toString().c_str(), ma_ra,
+                   Hours(ma_ra).toHourMinuteSecond().toString().c_str());
 
 #endif
 }

@@ -27,6 +27,26 @@ enum trackingRateS
 };
 #endif
 #elif MOTOR_TRACKING_RATE == TRACKING_RATE_D1_R32
+#define STEPS_PER_SECOND_256MICROSTEP 60
+
+// gear ratio 101.25, 1.8deg motor, 128 msteps, f_cpu@240MHz
+//#define TRACKER_MOTOR_MICROSTEPPING 128
+// enum trackingRateS
+//{
+//    TRACKING_SIDEREAL = 664846, // SIDEREAL (23h,56 min)
+//    TRACKING_SOLAR = 666667,    // SOLAR (24h)
+//    TRACKING_LUNAR = 680967,    // LUNAR (24h, 31 min)
+//};
+
+// gear ratio 101.25, 1.8deg motor, 256 msteps, f_cpu@240MHz
+#define TRACKER_MOTOR_MICROSTEPPING 256
+enum trackingRateS
+{
+    TRACKING_SIDEREAL = 332423, // SIDEREAL (23h,56 min)
+    TRACKING_SOLAR = 333333,    // SOLAR (24h)
+    TRACKING_LUNAR = 340483,    // LUNAR (24h, 31 min)
+};
+
 // gear ratio 101.25, 1.8deg motor, 64 msteps, f_cpu@240MHz
 //#define TRACKER_MOTOR_MICROSTEPPING 64
 // enum trackingRateS
@@ -35,18 +55,18 @@ enum trackingRateS
 //    TRACKING_SOLAR = 4000000,    // SOLAR (24h)
 //    TRACKING_LUNAR = 4085801,    // LUNAR (24h, 31 min)
 //};
+
 // gear ratio 101.25, 1.8deg motor, 64?? msteps, f_cpu@240MHz
-#define TRACKER_MOTOR_MICROSTEPPING 16
-#define STEPS_PER_SECOND_256MICROSTEP 60
-enum trackingRateS
-{
-    TRACKING_SIDEREAL = 5318765, // SIDEREAL (23h,56 min)
-    TRACKING_SOLAR = 5333333,    // SOLAR (24h)
-    TRACKING_LUNAR = 5447735,    // LUNAR (24h, 31 min)
-};
+//#define TRACKER_MOTOR_MICROSTEPPING 16
+// enum trackingRateS
+//{
+//    TRACKING_SIDEREAL = 5318765, // SIDEREAL (23h,56 min)
+//    TRACKING_SOLAR = 5333333,    // SOLAR (24h)
+//    TRACKING_LUNAR = 5447735,    // LUNAR (24h, 31 min)
+//};
+
 // gear ratio 101.25, 1.8deg motor, 16?? msteps, f_cpu@240MHz
 //#define TRACKER_MOTOR_MICROSTEPPING 16
-//#define STEPS_PER_SECOND_256MICROSTEP	60
 // enum trackingRateS
 //{
 //    TRACKING_SIDEREAL = 15956296, // SIDEREAL (23h,56 min)
