@@ -22,7 +22,7 @@ class Position
 class Direction
 {
   public:
-    bool tracking;
+    volatile bool tracking;
     bool requested;
     volatile bool absolute;
 };
@@ -98,12 +98,12 @@ class Axis
 
     void begin();
 
+    volatile uint16_t microStep;
   private:
     void setDirection(bool directionArg);
     void setMicrostep(uint16_t microstep);
 
     HardwareTimer stepTimer;
-    uint16_t microStep;
     uint8_t stepPin;
     uint8_t dirPin;
     uint8_t axisNumber;

@@ -30,7 +30,7 @@
 
 #define EN12_n MotorEnable
 
-#define HAVE_DISPLAY 1
+//#define HAVE_DISPLAY 1
 // LCD Display settings
 //#define LCD_COLUMNS 16
 //#define LCD_ROWS	2

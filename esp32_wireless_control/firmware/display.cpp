@@ -20,7 +20,7 @@ Display::Display()
 void Display::begin()
 {
     init();
-    if (xTaskCreate(displayTask, "display", 4096, this, 1, NULL))
+    if (xTaskCreatePinnedToCore(displayTask, "display", 4096, this, 1, NULL, 1))
         print_out("started displayTask");
 }
 

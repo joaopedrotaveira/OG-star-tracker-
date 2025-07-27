@@ -39,8 +39,8 @@ void IRAM_ATTR stepTimerRA_ISR()
 #endif
     }
 
-    int64_t position = ra_axis.getPosition();
-    uint16_t uStep = ra_axis.getMicrostep();
+    int64_t position = ra_axis.position;
+    uint16_t uStep = ra_axis.microStep;
     if (ra_axis_step_phase)
     {
         if (ra_axis.direction.absolute ^ ra_axis.direction.tracking)
@@ -51,12 +51,12 @@ void IRAM_ATTR stepTimerRA_ISR()
         {
             position += MAX_MICROSTEPS / (uStep ? uStep : 1);
         }
-        ra_axis.setPosition(position);
+        ra_axis.position = position;
     }
 
     if (ra_axis.counterActive && ra_axis_step_phase)
     { // if counter active
-        int temp = ra_axis.getAxisCount();
+        int temp = ra_axis.axisCountValue;
         if (ra_axis.direction.absolute ^ ra_axis.direction.tracking)
         {
             temp--;
@@ -65,7 +65,7 @@ void IRAM_ATTR stepTimerRA_ISR()
         {
             temp++;
         }
-        ra_axis.setAxisCount(temp);
+        ra_axis.axisCountValue = temp;
         if (ra_axis.goToTarget && ra_axis.getAxisCount() == ra_axis.getAxisTargetCount())
         {
             print_out("GotoTarget reached");
