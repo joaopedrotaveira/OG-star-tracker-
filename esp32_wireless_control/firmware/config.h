@@ -60,7 +60,7 @@
 
 #define TMC_R_SENSE 0.11f // Match to your driver
 #define AXIS_SERIAL_PORT Serial2
-#define AXIS_RX X_STOP
+#define AXIS_RX Z_STEP
 #define AXIS_TX Z_DIR
 
 #define AXIS1_ADDR 0

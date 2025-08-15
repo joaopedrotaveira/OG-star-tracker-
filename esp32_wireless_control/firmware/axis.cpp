@@ -160,7 +160,7 @@ void Axis::stopTracking()
 void Axis::gotoTarget(uint64_t rateArg, const Position& current, const Position& target)
 {
     setMicrostep(TRACKER_MOTOR_MICROSTEPPING / 2);
-    int64_t deltaArcseconds = target.arcseconds - current.arcseconds;
+    int64_t deltaArcseconds = -1 * (target.arcseconds - current.arcseconds);
 
     print_out_nonl("deltaArcseconds: %lld\n", deltaArcseconds);
 
@@ -179,10 +179,11 @@ void Axis::gotoTarget(uint64_t rateArg, const Position& current, const Position&
     int64_t stepsToMove = (deltaArcseconds * STEPS_PER_SECOND_256MICROSTEP) /
                           (MAX_MICROSTEPS / (microStep ? microStep : 1));
     bool directionTmp = (stepsToMove < 0) ^ direction.tracking;
+//    bool directionTmp = (stepsToMove > 0);
 
     print_out_nonl("stepsToMove: %lld\n", stepsToMove);
 
-    setPosition(current.arcseconds * STEPS_PER_SECOND_256MICROSTEP);
+//    setPosition(current.arcseconds * STEPS_PER_SECOND_256MICROSTEP);
     resetAxisCount();
     setAxisTargetCount(stepsToMove);
 

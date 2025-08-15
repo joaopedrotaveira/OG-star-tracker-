@@ -21,8 +21,8 @@
 #include "uart.h"
 #include "utils/sideral_functions.h"
 
-Display* display = new MenuDisplay(LCD_COLUMNS, LCD_ROWS, SDA_PIN, SCL_PIN, ENCODER_B_PIN,
-                                   ENCODER_A_PIN, BUTTON_PIN);
+//Display* display = new MenuDisplay(LCD_COLUMNS, LCD_ROWS, SDA_PIN, SCL_PIN, ENCODER_B_PIN,
+//                                   ENCODER_A_PIN, BUTTON_PIN);
 
 MENU_SCREEN(mainScreen, mainItems,
         ITEM_COMMAND("Status", []() { ((MenuDisplay*) display)->_menu.hide(); }),

@@ -557,10 +557,9 @@ void setup()
     // Start the debug serial connection
     setup_uart(&Serial, 115200);
 
-    //#if HAVE_DISPLAY
-    //    display.begin();
-    //#endif
-    //
+//    #if HAVE_DISPLAY
+//        display.begin();
+//    #endif
 
     // start UART task before any usage of print_out
     if (xTaskCreatePinnedToCore(uartTask, "uart", 4096, NULL, 1, NULL, 1))

@@ -10,7 +10,7 @@
 #include "uart.h"
 #include "utils/sideral_functions.h"
 
-// Display* display = new SimpleDisplay(SDA_PIN, SCL_PIN);
+ Display* display = new SimpleDisplay(SDA_PIN, SCL_PIN);
 
 LiquidCrystal_I2C lcd(0x27, LCD_COLUMNS, LCD_ROWS);
 char line[LCD_COLUMNS + 1];
